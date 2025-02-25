@@ -24,21 +24,28 @@ class Query
     }
     public function select($tabla, $datos)
     {
-        $query = "SELECT * FROM " . $tabla . " WHERE ";
-        $parametros = [];
-        foreach ($datos as $nombreCampo => $valor) {
-            $parametros[] = $nombreCampo . " = :" . $nombreCampo;
-        }
-        $query .= implode(" AND ", $parametros);
-        //echo $query."<br>";
-        $stmt = $this->conexion->prepare($query);
-        foreach ($datos as $nombreCampo => $valor) {
-            // echo"". $nombreCampo ."". $valor ."<br>";
-            $stmt->bindValue(':' . $nombreCampo, $valor);
-        }
+        if ($datos) {
+            $query = "SELECT * FROM " . $tabla . " WHERE ";
+            $parametros = [];
+            foreach ($datos as $nombreCampo => $valor) {
+                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+            }
+            $query .= implode(" OR ", $parametros);
+            //echo $query."<br>";
+            $stmt = $this->conexion->prepare($query);
+            foreach ($datos as $nombreCampo => $valor) {
+                // echo"". $nombreCampo ."". $valor ."<br>";
+                $stmt->bindValue(':' . $nombreCampo, $valor);
+            }
 
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } else if (!$datos) {
+            $query = "SELECT * FROM " . $tabla;
+            $stmt = $this->conexion->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 
     public function insert($tabla, $datos)
@@ -56,7 +63,7 @@ class Query
         }
 
         return $stmt->execute();
-        
+
     }
 
 }
