@@ -1,12 +1,12 @@
 <?php
 
-class Conexion
+class Query
 {
     private $conexion;
     private $sql;
     private $datos;
 
-    function __construct()
+    public function __construct()
     {
         $this->conexion = $this->conectar();
     }
@@ -23,29 +23,28 @@ class Conexion
         }
     }
 
-    public function select($tabla, $nombre, $clave)
+    public function select($tabla, $datos)
     {
         $query = "SELECT * FROM " . $tabla . " WHERE nombre = :nombre AND clave = :clave";
         $stmt = $this->conexion->prepare($query);
-        $stmt->execute([':nombre' => $nombre, ':clave' => $clave]);
+        foreach ($datos as $nombreCampo => $valor) {
+            $stmt->bindValue(':' . $nombreCampo, $valor);
+        }
         return $this->datos->fetch(PDO::FETCH_ASSOC);
     }
-    public function insert()
+
+    public function insert($tabla, $datos)
     {
-        $tabla = "prestamos";
-        $datos = "Ruben,123,1daw,rubenmail,123456789,direccion";
         $columnas = implode(", ", array_keys($datos));
         $valores = ":" . implode(", :", array_keys($datos));
-
-        // Crear la consulta segura con placeholders
         $query = "INSERT INTO $tabla ($columnas) VALUES ($valores)";
+        $stmt = $this->conexion->prepare($query);
+        foreach ($datos as $nombreCampo => $valor) {
+            $stmt->bindValue(':' . $nombreCampo, $valor);
+        }
+        $stmt->execute();
         echo $query;
-        /*  $stmt = $this->conexion->prepare($query);
-         // Ejecutar con los valores correspondientes
-        $stmt->execute($datos);
 
-         // Devolver el ID del último registro insertado
-         return $this->conexion->lastInsertId(); */
     }
 
 
