@@ -19,7 +19,7 @@ if ($accionARealizar == 'login') {
         'nombre' => $_POST['nombre'],
         'pass' => $_POST['contrasena']
     );
-    $resultado = $query->select('usuarios', $datos, 1);
+    $resultado = $query->select('usuarios', $datos, false );
     //echo $resultado."<br>";
     if ($resultado) {
         //echo 'Usuario encontrado';
@@ -39,9 +39,9 @@ if ($accionARealizar == 'login') {
             'materia' => $_POST['filtro'],
 
         );
-        $resultado = $query->select('documento', $datos);
+        $resultado = $query->select('documento', $datos,true);
     } else {
-        $resultado = $query->select('documento', null);
+        $resultado = $query->select('documento', null, false);
     }
 
     $textoAImprimir = "<table><tr><th>Titulo</th><th>Autores</th><th>Fecha de publicacion</th><th>Descripcion</th><th>Materia</th></tr>";

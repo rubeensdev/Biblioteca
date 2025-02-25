@@ -22,9 +22,25 @@ class Query
             return null;
         }
     }
-    public function select($tabla, $datos)
+    public function select($tabla, $datos, $filtro)
     {
-        if ($datos) {
+        if ($datos && !$filtro) {
+            $query = "SELECT * FROM " . $tabla . " WHERE ";
+            $parametros = [];
+            foreach ($datos as $nombreCampo => $valor) {
+                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+            }
+            $query .= implode(" AND ", $parametros);
+            //echo $query."<br>";
+            $stmt = $this->conexion->prepare($query);
+            foreach ($datos as $nombreCampo => $valor) {
+                // echo"". $nombreCampo ."". $valor ."<br>";
+                $stmt->bindValue(':' . $nombreCampo, $valor);
+            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else if ($datos && $filtro ) {
             $query = "SELECT * FROM " . $tabla . " WHERE ";
             $parametros = [];
             foreach ($datos as $nombreCampo => $valor) {
@@ -40,7 +56,7 @@ class Query
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else if (!$datos) {
+        }else if (!$datos) {
             $query = "SELECT * FROM " . $tabla;
             $stmt = $this->conexion->prepare($query);
             $stmt->execute();
