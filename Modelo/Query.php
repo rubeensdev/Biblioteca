@@ -39,7 +39,7 @@ class Query
             }
 
             $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else if (!$datos) {
             $query = "SELECT * FROM " . $tabla;
             $stmt = $this->conexion->prepare($query);
