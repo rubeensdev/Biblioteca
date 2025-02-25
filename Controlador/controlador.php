@@ -1,18 +1,29 @@
 <?php
+session_start();
 
-include '/../Modelo/Query.php';
+include '../Modelo/Query.php';
 
+$resultado = null;
 $query = new Query();
-$datos = array($_POST['nombre'], $_POST['contraseña']);
-var_dump($datos);
+$datos = array(
+    'nombre' => $_POST['nombre'],
+    'pass' => $_POST['contrasena']
+);
+//var_dump($datos)."<br>";
 $accionARealizar = $_POST['accion'];
+
 if ($accionARealizar == 'login') {
-    $datos = array($_POST['nombre'], $_POST['contraseña']);
-    $resultado->$query->select('usuarios', $datos);
+    $resultado = $query->select('usuarios', $datos);
+    //echo $resultado."<br>";
     if ($resultado) {
-        header('Location: ../Vista/logeoExitoso.php');
+        //echo 'Usuario encontrado';
+        header('Location: ../Vista/loginExitoso.html');
+        $_SESSION['nombre'] = $_POST['nombre'];
+        $_SESSION['contrasena'] = $_POST['contrasena'];
+
     } else {
-        header('Location: ../Vista/VistaUsuario.php');
+        //echo 'Usuario no encontrado';
+        header('Location: ../Vista/VistaUsuario.html');
     }
 
 

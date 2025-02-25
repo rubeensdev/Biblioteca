@@ -14,7 +14,7 @@ class Query
     private function conectar()
     {
         try {
-            $con = new PDO('mysql:host=127.0.0.1;dbname=biblioteca', 'root', 'root');
+            $con = new PDO('mysql:host=127.0.0.1;dbname=biblioteca', 'root', '');
             $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $con;
         } catch (PDOException $e) {
@@ -22,33 +22,42 @@ class Query
             return null;
         }
     }
-
     public function select($tabla, $datos)
     {
-        $query = "SELECT * FROM " . $tabla . " WHERE nombre = :nombre AND clave = :clave";
+        $query = "SELECT * FROM " . $tabla . " WHERE ";
+        $parametros = [];
+        foreach ($datos as $nombreCampo => $valor) {
+            $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+        }
+        $query .= implode(" AND ", $parametros);
+        //echo $query."<br>";
         $stmt = $this->conexion->prepare($query);
         foreach ($datos as $nombreCampo => $valor) {
+            // echo"". $nombreCampo ."". $valor ."<br>";
             $stmt->bindValue(':' . $nombreCampo, $valor);
         }
-        return $this->datos->fetch(PDO::FETCH_ASSOC);
+
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function insert($tabla, $datos)
     {
-        $columnas = implode(", ", array_keys($datos));
-        $valores = ":" . implode(", :", array_keys($datos));
-        $query = "INSERT INTO $tabla ($columnas) VALUES ($valores)";
+        $query = "INSERT INTO " . $tabla . " VALUES ";
+        $parametros = [];
+        foreach ($datos as $nombreCampo => $valor) {
+            $parametros[] = ":" . $nombreCampo;
+        }
+        //echo $query."<br>";
         $stmt = $this->conexion->prepare($query);
         foreach ($datos as $nombreCampo => $valor) {
+            // echo"". $nombreCampo ."". $valor ."<br>";
             $stmt->bindValue(':' . $nombreCampo, $valor);
         }
-        $stmt->execute();
-        echo $query;
 
+        return $stmt->execute();
+        
     }
 
-
 }
-$conn = new Conexion();
-$conn->insert();
 
