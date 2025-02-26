@@ -11,8 +11,11 @@
     <?php
     session_start();
     echo "Bienvenido a tu panel," . $_SESSION['nombre'];
+    echo "<br><br><a href='../Controlador/controladorCerrarSesion.php'>Cerrar sesion</a>";
 
-    echo "<a href='../Controlador/controlador.php?accion=mostrarTablas'>Ver documentos</a>";
+    echo "<br><br><a href='../Controlador/controladorTablas.php'>Ver documentos</a>";
+
+    echo "<br><br><a href='../Controlador/controladorPrestamos.php'>Pedir documento</a>";
 
     ?>
 </body>

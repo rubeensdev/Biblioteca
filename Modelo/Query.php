@@ -1,11 +1,9 @@
 <?php
+session_start();
 
 class Query
 {
     private $conexion;
-    private $sql;
-    private $datos;
-
     public function __construct()
     {
         $this->conexion = $this->conectar();
@@ -40,7 +38,7 @@ class Query
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else if ($datos && $filtro ) {
+        } else if ($datos && $filtro) {
             $query = "SELECT * FROM " . $tabla . " WHERE ";
             $parametros = [];
             foreach ($datos as $nombreCampo => $valor) {
@@ -56,7 +54,19 @@ class Query
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }else if (!$datos) {
+        } else if (!$datos && $filtro == "prestamos") {
+            $query = "SELECT * FROM " . $tabla . " WHERE numEjemplares >= 1";
+            $stmt = $this->conexion->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            //echo $query."<br>";
+        } else if (!$datos && $filtro == "prestamos") {
+            $query = "SELECT * FROM " . $tabla . " WHERE numEjemplares >= 1";
+            $stmt = $this->conexion->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            //echo $query."<br>";
+        } else if (!$datos) {
             $query = "SELECT * FROM " . $tabla;
             $stmt = $this->conexion->prepare($query);
             $stmt->execute();
