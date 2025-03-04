@@ -27,15 +27,20 @@ if ($accionARealizar == null) {
         $textoAImprimir .= "<td><a href='controladorPrestamos.php?accion=prestar&id=" . $valor['id'] . "'>Prestar</a></td>";
         $textoAImprimir .= "</tr>";
     }
-} else if ($accionARealizar == "contarPrestamos") {
-    $resultado = $query->select('documento', null, "contarPrestamos");
-    if ($resultado["contador"] >= "6") {
+} else if ($accionARealizar == "prestar") {
+    $resultado = $query->select('prestamos', $_SESSION['idUser'], 'contadorPrestamos');
+    if (count($resultado['contador']) == "6") {
         header("Location: ../Vista/panelUsuario.php?mensaje=Ya tienes 6 prestamos activos");
     } else {
+        $fechaP = (new DateTime())->format('Y-m-d');
+        $fechaD = (new DateTime())->modify('+3 weeks')->format('Y-m-d');
         $datos = array(
-            'idUsuario' => $_SESSION['id']
-
+            'fechaP' => $fechaP,
+            'fechaD' => $fechaD,
+            'idUsuario' => $_SESSION['idUser'],
+            'idEjemplar' => $_GET['id']
         );
+    
         $query->insert('prestamos', $datos);
     }
 }

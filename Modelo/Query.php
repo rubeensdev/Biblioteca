@@ -54,15 +54,42 @@ class Query
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else if (!$datos && $filtro == "prestamos") {
-            $query = "SELECT * FROM " . $tabla . " WHERE numEjemplares >= 1";
+        }else if ($datos && $filtro && $tabla = 'documento') {
+            $query = "SELECT * FROM " . $tabla . " WHERE  isLibro = 0 and isRevista = 0 and ";
+            $parametros = [];
+            foreach ($datos as $nombreCampo => $valor) {
+                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+            }
+            $query .= implode(" OR ", $parametros);
+            //echo $query."<br>";
             $stmt = $this->conexion->prepare($query);
+            foreach ($datos as $nombreCampo => $valor) {
+                // echo"". $nombreCampo ."". $valor ."<br>";
+                $stmt->bindValue(':' . $nombreCampo, $valor);
+            }
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else if ($datos && !$filtro && $tabla = 'documento') {
+            $query = "SELECT * FROM " . $tabla . " WHERE isLibro = 0 and isRevista = 0 and ";
+            $parametros = [];
+            foreach ($datos as $nombreCampo => $valor) {
+                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+            }
+            $query .= implode(" AND ", $parametros);
             //echo $query."<br>";
-        } else if (!$datos && $filtro == "prestamos") {
-            $query = "SELECT * FROM " . $tabla . " WHERE numEjemplares >= 1";
             $stmt = $this->conexion->prepare($query);
+            foreach ($datos as $nombreCampo => $valor) {
+                // echo"". $nombreCampo ."". $valor ."<br>";
+                $stmt->bindValue(':' . $nombreCampo, $valor);
+            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else if ($datos && $filtro == "contadorPrestamos") {
+            $query = "SELECT count(*) as contador FROM " . $tabla . " WHERE numEjemplares >= 1 and idUsuario = :idUsuario";
+            $stmt = $this->conexion->prepare($query);
+             $stmt->bindValue(':idUsuario', $datos);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
             //echo $query."<br>";

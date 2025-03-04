@@ -12,6 +12,7 @@ $resultado = $query->select('usuarios', $datos,false);
 if ($resultado) {
     //echo 'Usuario encontrado';
     header('Location: ../Vista/panelUsuario.php');
+    $_SESSION['idUser'] = &resultado['idUser'];
     $_SESSION['nombre'] = $_POST['nombre'];
     $_SESSION['contrasena'] = $_POST['contrasena'];
 
