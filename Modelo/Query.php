@@ -26,7 +26,7 @@ class Query
             $query = "SELECT * FROM " . $tabla . " WHERE ";
             $parametros = [];
             foreach ($datos as $nombreCampo => $valor) {
-                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+                $parametros[] = $nombreCampo . " =:" . $nombreCampo;
             }
             $query .= implode(" AND ", $parametros);
             //echo $query."<br>";
@@ -38,86 +38,48 @@ class Query
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else if ($datos && $filtro) {
-            $query = "SELECT * FROM " . $tabla . " WHERE ";
-            $parametros = [];
-            foreach ($datos as $nombreCampo => $valor) {
-                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
-            }
-            $query .= implode(" OR ", $parametros);
-            //echo $query."<br>";
-            $stmt = $this->conexion->prepare($query);
-            foreach ($datos as $nombreCampo => $valor) {
-                // echo"". $nombreCampo ."". $valor ."<br>";
-                $stmt->bindValue(':' . $nombreCampo, $valor);
-            }
+        }
 
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }else if ($datos && $filtro && $tabla = 'documento') {
-            $query = "SELECT * FROM " . $tabla . " WHERE  isLibro = 0 and isRevista = 0 and ";
-            $parametros = [];
-            foreach ($datos as $nombreCampo => $valor) {
-                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
+        if ($datos && $filtro) {
+            if ($filtro == "contadorPrestamos") {
+                $query = "SELECT count(*) as contador FROM " . $tabla . " WHERE idUsuario = :idUsuario";
+                $stmt = $this->conexion->prepare($query);
+                $stmt->bindValue(':idUsuario', $datos);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                //echo $query."<br>";
+            } else if ($filtro == "filtrarDocs") {
+                $query = "SELECT * FROM " . $tabla . " WHERE ";
+                $parametros = [];
+                foreach ($datos as $nombreCampo => $valor) {
+                    $parametros[] = $nombreCampo . " LIKE :" . $nombreCampo;
+                }
+                $query .= implode(" OR ", $parametros);
+                $stmt = $this->conexion->prepare($query);
+                foreach ($datos as $nombreCampo => $valor) {
+                    $stmt->bindValue(':' . $nombreCampo, '%' . $valor . '%');
+                }
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
-            $query .= implode(" OR ", $parametros);
-            //echo $query."<br>";
-            $stmt = $this->conexion->prepare($query);
-            foreach ($datos as $nombreCampo => $valor) {
-                // echo"". $nombreCampo ."". $valor ."<br>";
-                $stmt->bindValue(':' . $nombreCampo, $valor);
-            }
-
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else if ($datos && !$filtro && $tabla = 'documento') {
-            $query = "SELECT * FROM " . $tabla . " WHERE isLibro = 0 and isRevista = 0 and ";
-            $parametros = [];
-            foreach ($datos as $nombreCampo => $valor) {
-                $parametros[] = $nombreCampo . " = :" . $nombreCampo;
-            }
-            $query .= implode(" AND ", $parametros);
-            //echo $query."<br>";
-            $stmt = $this->conexion->prepare($query);
-            foreach ($datos as $nombreCampo => $valor) {
-                // echo"". $nombreCampo ."". $valor ."<br>";
-                $stmt->bindValue(':' . $nombreCampo, $valor);
-            }
-
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else if ($datos && $filtro == "contadorPrestamos") {
-            $query = "SELECT count(*) as contador FROM " . $tabla . " WHERE numEjemplares >= 1 and idUsuario = :idUsuario";
-            $stmt = $this->conexion->prepare($query);
-             $stmt->bindValue(':idUsuario', $datos);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            //echo $query."<br>";
-        } else if (!$datos) {
+        }
+        if (!$datos) {
             $query = "SELECT * FROM " . $tabla;
             $stmt = $this->conexion->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     }
-
     public function insert($tabla, $datos)
     {
-        $query = "INSERT INTO " . $tabla . " VALUES ";
-        $parametros = [];
-        foreach ($datos as $nombreCampo => $valor) {
-            $parametros[] = ":" . $nombreCampo;
-        }
-        //echo $query."<br>";
+        $query = 'INSERT INTO ' . $tabla . '(`FechaP`, `FechaD`, `IdUsuario`, `IdEjemplar`) VALUES(:fechaP, :fechaD, :idUsuario, :idEjemplar)';
+        //echo $query."<br>";        
         $stmt = $this->conexion->prepare($query);
-        foreach ($datos as $nombreCampo => $valor) {
-            // echo"". $nombreCampo ."". $valor ."<br>";
-            $stmt->bindValue(':' . $nombreCampo, $valor);
-        }
-
+        $stmt->bindValue(':fechaP', $datos['fechaP']);
+        $stmt->bindValue(':fechaD', $datos['fechaD']);
+        $stmt->bindValue(':idUsuario', $datos['idUsuario']);
+        $stmt->bindValue(':idEjemplar', $datos['idEjemplar']);
         return $stmt->execute();
-
     }
-
 }
 

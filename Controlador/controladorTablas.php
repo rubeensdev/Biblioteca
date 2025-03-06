@@ -13,7 +13,7 @@ if (($_POST['filtro']) != null) {
         'materia' => $_POST['filtro'],
 
     );
-    $resultado = $query->select('documento', $datos, true);
+    $resultado = $query->select('documento', $datos, "filtrarDocs");
 } else {
 
     $resultado = $query->select('documento', null, false);

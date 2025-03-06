@@ -10,6 +10,9 @@
 <body>
     <?php
     session_start();
+    if (isset($_GET['mensaje'])){
+        echo $_GET['mensaje'];
+    }
     echo "Bienvenido a tu panel," . $_SESSION['nombre'];
     echo "<br><br><a href='../Controlador/controladorCerrarSesion.php'>Cerrar sesion</a>";
 
